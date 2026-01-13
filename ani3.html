@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Software Company Headline</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 80px;
+  }
+
+  .top-title {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .headline {
+    font-size: 34px;
+    font-weight: 600;
+  }
+
+  .highlight {
+    color: #2563eb;
+    transition: opacity 0.5s ease-in-out;
+  }
+</style>
+</head>
+<body>
+
+<h1 class="top-title">Innovative Software Solutions</h1>
+
+<h2 class="headline">
+  That Power
+  <span class="highlight" id="rotatingText">Business Growth</span>
+</h2>
+
+<script>
+  const phrases = [
+    "Digital Transformation",
+    "Scalable Innovation",
+    "Smart Automation",
+    "Future-Ready Businesses",
+    "Data-Driven Growth",
+    "Agile Software Excellence",
+    "Next-Gen Technology",
+    "Sustainable Success"
+  ];
+
+  let index = 0;
+  const textElement = document.getElementById("rotatingText");
+
+  setInterval(() => {
+    index = (index + 1) % phrases.length;
+    textElement.style.opacity = 0;
+
+    setTimeout(() => {
+      textElement.textContent = phrases[index];
+      textElement.style.opacity = 1;
+    }, 500);
+  }, 2000);
+</script>
+
+</body>
+</html>

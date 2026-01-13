@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hover Background Effect</title>
+
+<style>
+:root {
+  --square-size: clamp(40px, 5vw, 80px);
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: #000;
+  overflow: hidden;
+}
+
+/* DEFAULT GRID (before hover) */
+.square-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: var(--square-size) var(--square-size);
+  transition: background-image 0.4s ease;
+  z-index: 1;
+}
+
+/* GREY BOX OVERLAY */
+.random-grey-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--square-size));
+  grid-template-rows: repeat(auto-fill, var(--square-size));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.filled-box {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* MOUSE GLOW */
+.mouse-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 3;
+}
+
+/* HOVER EFFECT */
+body.hover-active .square-grid {
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.15) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+}
+
+body.hover-active .random-grey-overlay {
+  opacity: 0.8;
+}
+
+body.hover-active .mouse-glow {
+  opacity: 1;
+}
+</style>
+</head>
+
+<body>
+
+<div class="square-grid"></div>
+<div class="random-grey-overlay" id="grey-boxes"></div>
+<div class="mouse-glow" id="mouseGlow"></div>
+
+<script>
+/* Generate Random Grey Boxes */
+const container = document.getElementById("grey-boxes");
+
+function genBoxes() {
+  const size = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--square-size")) || 80;
+  const cols = Math.ceil(window.innerWidth / size);
+  const rows = Math.ceil(window.innerHeight / size);
+  container.innerHTML = "";
+
+  for (let i = 0; i < cols * rows; i++) {
+    const div = document.createElement("div");
+    if (Math.random() > 0.96) div.classList.add("filled-box");
+    container.appendChild(div);
+  }
+}
+
+genBoxes();
+window.addEventListener("resize", genBoxes);
+
+/* Hover detection on entire screen */
+document.addEventListener("mouseenter", () => {
+  document.body.classList.add("hover-active");
+});
+document.addEventListener("mouseleave", () => {
+  document.body.classList.remove("hover-active");
+});
+
+/* Mouse Glow Effect */
+const glow = document.getElementById("mouseGlow");
+document.addEventListener("mousemove", (e) => {
+  glow.style.left = e.clientX + "px";
+  glow.style.top = e.clientY + "px";
+});
+</script>
+
+</body>
+</html>

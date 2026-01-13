@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>After Hover Background</title>
+
+<style>
+:root {
+  --square-size: clamp(40px, 5vw, 80px);
+}
+
+body {
+  margin: 0;
+  background: #000;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.square-grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.15) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  background-size: var(--square-size) var(--square-size);
+}
+
+/* Random Grey Overlay */
+.random-grey-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--square-size));
+  grid-template-rows: repeat(auto-fill, var(--square-size));
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.filled-box {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Mouse glow */
+.mouse-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+</style>
+</head>
+
+<body>
+
+<div class="square-grid"></div>
+<div class="random-grey-overlay" id="box-container"></div>
+<div class="mouse-glow" id="mouse-glow"></div>
+
+<script>
+/* Generate random gray boxes */
+const container = document.getElementById("box-container");
+
+function getBoxSize() {
+  return parseInt(
+    getComputedStyle(document.documentElement).getPropertyValue("--square-size")
+  ) || 80;
+}
+
+function generate() {
+  const boxSize = getBoxSize();
+  const cols = Math.ceil(window.innerWidth / boxSize);
+  const rows = Math.ceil(window.innerHeight / boxSize);
+
+  container.innerHTML = "";
+  for (let i=0; i < cols*rows; i++) {
+    const div = document.createElement("div");
+    if (Math.random() > 0.96) div.classList.add("filled-box");
+    container.appendChild(div);
+  }
+}
+
+generate();
+window.addEventListener("resize", generate);
+
+/* Mouse glow movement */
+const glow = document.getElementById("mouse-glow");
+
+document.addEventListener("mousemove", (e) => {
+  glow.style.left = e.clientX + "px";
+  glow.style.top = e.clientY + "px";
+});
+</script>
+
+</body>
+</html>

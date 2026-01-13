@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Innovative Software Solutions</title>
+
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    margin-top: 80px;
+    background: #ffffff;
+    color: #111827;
+  }
+
+  .top-title {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .headline {
+    font-size: 34px;
+    font-weight: 600;
+  }
+
+  .start-text {
+    margin-right: 8px;
+  }
+
+  .highlight {
+    color: #2563eb;
+    transition: opacity 0.5s ease-in-out;
+  }
+</style>
+</head>
+
+<body>
+
+<h1 class="top-title">Innovative Software Solutions</h1>
+
+<h2 class="headline">
+  <span class="start-text">From Idea to Innovation</span>
+  <span class="highlight" id="rotatingText">Digital Excellence</span>
+</h2>
+
+<script>
+  const phrases = [
+    "Digital Excellence",
+    "Scalable Digital Growth",
+    "Intelligent Automation",
+    "Future-Ready Solutions",
+    "Innovation at Scale",
+    "Data-Driven Intelligence",
+    "Next-Gen Software",
+    "Technology That Delivers"
+  ];
+
+  let index = 0;
+  const textElement = document.getElementById("rotatingText");
+
+  setInterval(() => {
+    index = (index + 1) % phrases.length;
+    textElement.style.opacity = 0;
+
+    setTimeout(() => {
+      textElement.textContent = phrases[index];
+      textElement.style.opacity = 1;
+    }, 500);
+  }, 2000);
+</script>
+
+</body>
+</html>

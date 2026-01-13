@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Text Hover Animation Menu</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Teko', sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#111;
+}
+
+.menu{
+    text-align:center;
+}
+
+.menu ul{
+    list-style:none;
+}
+
+.menu li{
+    position:relative;
+    overflow:hidden;
+    height:90px;
+}
+
+.menu a{
+    position:relative;
+    display:inline-block;
+    font-size:80px;
+    font-weight:700;
+    color:#fff;
+    text-decoration:none;
+    line-height:90px;
+    transition:transform 0.45s ease;
+}
+
+.menu a::after{
+    content:attr(data-text);
+    position:absolute;
+    left:0;
+    top:100%;
+    width:100%;
+    color:#ff0047;
+}
+
+.menu li:hover a{
+    transform:translateY(-100%);
+}
+</style>
+</head>
+
+<body>
+
+<nav class="menu">
+    <ul>
+        <li><a href="#" data-text="Home">Home</a></li>
+        <li><a href="#" data-text="About">About</a></li>
+        <li><a href="#" data-text="Services">Services</a></li>
+        <li><a href="#" data-text="Team">Team</a></li>
+        <li><a href="#" data-text="Portfolio">Portfolio</a></li>
+        <li><a href="#" data-text="Contact">Contact</a></li>
+    </ul>
+</nav>
+
+</body>
+</html>

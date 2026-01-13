@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smooth CTA Section</title>
+
+<style>
+:root {
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #ff4400;
+  --secondary-foreground: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.15);
+  --square-size: clamp(40px, 5vw, 80px);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.cta-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* GRID BACKGROUND */
+.square-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: var(--square-size) var(--square-size);
+  transition: opacity 0.4s ease;
+}
+
+.random-grey-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--square-size));
+  grid-template-rows: repeat(auto-fill, var(--square-size));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.filled-box {
+  background: rgba(255, 255, 255, 0.2);
+  width: 100%;
+  height: 100%;
+}
+
+.mouse-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+}
+
+.dark-overlay-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0) 74%, rgb(0, 0, 0) 100%);
+  pointer-events: none;
+}
+
+/* CTA BUTTON */
+.cta-button {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 24px);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--primary-foreground);
+  border: 1px solid var(--border-color);
+  padding: clamp(12px, 2.5vw, 20px) clamp(24px, 4vw, 40px)
+    clamp(12px, 2.5vw, 20px) clamp(12px, 2.5vw, 20px);
+  font-size: clamp(24px, 4vw, 54px);
+  font-weight: 400;
+  border-radius: clamp(50px, 10vw, 100px);
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease,
+    padding 0.3s ease;
+  position: relative;
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.cta-icon {
+  background-color: var(--secondary);
+  border-radius: 50%;
+  padding: clamp(12px, 2.5vw, 24px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.6s ease, background-color 0.6s ease;
+}
+
+.cta-icon svg {
+  width: clamp(24px, 3vw, 48px);
+  height: clamp(24px, 3vw, 48px);
+}
+
+.cta-icon path {
+  transition: stroke 0.6s ease;
+}
+
+.cta-button > div:last-child {
+  transition: transform 0.6s ease;
+  flex-grow: 1;
+}
+
+/* Hover Effects */
+.cta-button:hover {
+  background: var(--secondary);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.02);
+  padding-left: clamp(24px, 4vw, 40px);
+}
+
+.cta-button:hover .cta-icon {
+  transform: translateX(var(--icon-move)) rotate(360deg);
+  background-color: var(--secondary-foreground);
+}
+
+.cta-button:hover .cta-icon path {
+  stroke: var(--secondary);
+}
+
+.cta-button:hover > div:last-child {
+  transform: translateX(var(--text-move));
+}
+
+.cta-button:hover ~ .square-grid {
+  background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.15) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+}
+
+.cta-button:hover ~ .random-grey-overlay {
+  opacity: 0.8;
+}
+
+/* DOP TEXT */
+.dope-text {
+  margin-top: clamp(16px, 2vw, 24px);
+  font-size: clamp(14px, 1.5vw, 18px);
+  color: rgba(255, 255, 255, 0.6);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  z-index: 10;
+  text-align: center;
+}
+
+.cta-button:hover ~ .dope-text {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+
+<body>
+
+<main>
+  <section class="cta-section">
+
+    <a href="#" class="cta-button">
+      <div class="cta-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round">
+          <path d="M5 12l14 0" />
+          <path d="M15 16l4 -4" />
+          <path d="M15 8l4 4" />
+        </svg>
+      </div>
+      <div>
+        <p>Let's Get Started</p>
+      </div>
+    </a>
+
+    <div class="dope-text">Start your digital journey with us</div>
+    <div class="square-grid"></div>
+    <div class="random-grey-overlay" id="box-container"></div>
+    <div class="mouse-glow" id="mouse-glow"></div>
+    <div class="dark-overlay-grid"></div>
+
+  </section>
+</main>
+
+<script>
+const container = document.getElementById("box-container");
+const mouseGlow = document.getElementById("mouse-glow");
+const ctaButton = document.querySelector(".cta-button");
+const ctaIcon = document.querySelector(".cta-icon");
+const ctaText = document.querySelector(".cta-button > div:last-child");
+
+function getBoxSize() {
+  return parseInt(
+    getComputedStyle(document.documentElement).getPropertyValue("--square-size")
+  ) || 80;
+}
+
+function updateTransforms() {
+  const buttonRect = ctaButton.getBoundingClientRect();
+  const iconRect = ctaIcon.getBoundingClientRect();
+  const computedStyle = getComputedStyle(ctaButton);
+
+  const buttonWidth = buttonRect.width;
+  const iconWidth = iconRect.width;
+  const buttonPadding = parseFloat(computedStyle.paddingLeft);
+  const gap = parseFloat(computedStyle.gap);
+
+  const maxIconMove = buttonWidth - buttonPadding * 3 - iconWidth;
+  const iconToRightEdge = Math.max(0, maxIconMove);
+  const textMoveLeft = -(iconWidth + gap);
+
+  ctaButton.style.setProperty("--icon-move", `${iconToRightEdge}px`);
+  ctaButton.style.setProperty("--text-move", `${textMoveLeft}px`);
+}
+
+ctaButton.addEventListener("mouseenter", updateTransforms);
+window.addEventListener("resize", updateTransforms);
+updateTransforms();
+
+/* GREY BOX EFFECT */
+function generate() {
+  const boxSize = getBoxSize();
+  const cols = Math.ceil(window.innerWidth / boxSize);
+  const rows = Math.ceil(window.innerHeight / boxSize);
+  container.innerHTML = "";
+
+  for (let i = 0; i < cols * rows; i++) {
+    const b = document.createElement("div");
+    if (Math.random() > 0.96) b.classList.add("filled-box");
+    container.appendChild(b);
+  }
+}
+
+generate();
+window.addEventListener("resize", generate);
+
+/* MOUSE GLOW */
+document.addEventListener("mousemove", (e) => {
+  mouseGlow.style.left = e.clientX + "px";
+  mouseGlow.style.top = e.clientY + "px";
+  mouseGlow.style.opacity = "1";
+});
+
+document.addEventListener("mouseleave", () => {
+  mouseGlow.style.opacity = "0";
+});
+</script>
+
+</body>
+</html>

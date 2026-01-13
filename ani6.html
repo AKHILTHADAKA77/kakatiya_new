@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Full Navigation Dropdown</title>
+
+<style>
+:root {
+  --base-size: 8px;
+  --bg-body: #0a0a0a;
+  --bg-panel: #000000;
+  --border-color: #333333;
+  --text-primary: #ededed;
+  --text-secondary: #a1a1a1;
+  --accent: #ffffff;
+  --hover-bg: #1f1f1f;
+  --focus-ring: rgba(255, 255, 255, 0.5);
+  --nav-height: calc(var(--base-size) * 8);
+  --dropdown-width: calc(var(--base-size) * 75);
+  --border-radius: calc(var(--base-size) * 1.5);
+  --ease-rubber: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --duration-fast: 200ms;
+  --duration-medium: 300ms;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  justify-content: center;
+  padding-top: calc(var(--base-size) * 5);
+}
+ul {
+  list-style: none;
+}
+a,
+button {
+  text-decoration: none;
+  color: inherit;
+  font-family: inherit;
+}
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.nav {
+  position: relative;
+  z-index: 100;
+}
+.nav__list {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--base-size) * 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  padding: calc(var(--base-size) * 0.75);
+  border-radius: 99px;
+  border: 1px solid var(--border-color);
+}
+.nav__item {
+  position: relative;
+}
+.nav__link {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--base-size) * 0.75);
+  padding: var(--base-size) calc(var(--base-size) * 2);
+  font-size: calc(var(--base-size) * 1.75);
+  color: var(--text-secondary);
+  border-radius: 99px;
+  transition: color var(--duration-fast), background-color var(--duration-fast);
+  cursor: pointer;
+  user-select: none;
+}
+.nav__link:hover,
+.nav__link.nav__link-active,
+.nav__link[aria-expanded="true"] {
+  color: var(--text-primary);
+  background-color: var(--hover-bg);
+}
+.nav__arrow {
+  width: calc(var(--base-size) * 1.75);
+  height: calc(var(--base-size) * 1.75);
+  transition: transform var(--duration-fast) var(--ease-smooth);
+  opacity: 0.6;
+}
+.nav__link:hover .nav__arrow,
+.nav__link.nav__link-active .nav__arrow,
+.nav__link[aria-expanded="true"] .nav__arrow {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+.dropdown {
+  position: absolute;
+  top: calc(100% + (var(--base-size) * 1.5));
+  left: 0;
+  width: var(--dropdown-width);
+  perspective: 1000px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(calc(var(--base-size) * -1.25)) scale(0.96);
+  transform-origin: top center;
+  transition: opacity var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-smooth),
+    visibility var(--duration-fast);
+}
+.dropdown.dropdown-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+.dropdown__background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--current-height, 300px);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
+  transition: height var(--duration-medium) var(--ease-smooth);
+  overflow: hidden;
+  z-index: 1;
+}
+.dropdown__viewport {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  overflow: hidden;
+}
+.dropdown__menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(calc(var(--base-size) * 1.25));
+  transition: opacity var(--duration-medium) var(--ease-smooth),
+    transform var(--duration-medium) var(--ease-smooth),
+    visibility var(--duration-medium);
+  padding: calc(var(--base-size) * 3);
+}
+.dropdown__menu.is-active {
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: calc(var(--base-size) * 3);
+}
+.menu-item {
+  display: flex;
+  gap: calc(var(--base-size) * 1.5);
+  padding: var(--base-size);
+  border-radius: var(--base-size);
+  transition: background var(--duration-fast);
+  cursor: pointer;
+}
+.menu-item:hover {
+  background: var(--hover-bg);
+}
+.menu-item__icon {
+  width: calc(var(--base-size) * 4.5);
+  height: calc(var(--base-size) * 4.5);
+  border-radius: calc(var(--base-size) * 0.75);
+  background: #1a1a1a;
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.menu-item__icon svg {
+  width: calc(var(--base-size) * 2.25);
+  height: calc(var(--base-size) * 2.25);
+  color: #fff;
+}
+.menu-item__title {
+  font-size: calc(var(--base-size) * 1.75);
+  font-weight: 500;
+}
+.menu-item__desc {
+  font-size: calc(var(--base-size) * 1.625);
+  color: var(--text-secondary);
+}
+.section-title {
+  font-size: calc(var(--base-size) * 1.5);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: calc(var(--base-size) * 2);
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main Navigation">
+  <ul class="nav__list" role="menubar">
+    <li class="nav__item" role="none">
+      <button type="button" class="nav__link" aria-haspopup="true" aria-expanded="false" aria-controls="products" role="menuitem">
+        Products
+        <svg class="nav__arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </li>
+
+    <li class="nav__item" role="none">
+      <button type="button" class="nav__link" aria-haspopup="true" aria-expanded="false" aria-controls="solutions" role="menuitem">
+        Solutions
+        <svg class="nav__arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </li>
+
+    <li class="nav__item" role="none">
+      <button type="button" class="nav__link" aria-haspopup="true" aria-expanded="false" aria-controls="resources" role="menuitem">
+        Resources
+        <svg class="nav__arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </li>
+
+    <li class="nav__item" role="none">
+      <button type="button" class="nav__link" aria-haspopup="true" aria-expanded="false" aria-controls="enterprise" role="menuitem">
+        Enterprise
+        <svg class="nav__arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </li>
+  </ul>
+
+  <!-- DROPDOWN -->
+  <div class="dropdown" aria-hidden="true">
+    <div class="dropdown__background"></div>
+    <div class="dropdown__viewport">
+
+      <!-- PRODUCTS MENU -->
+      <div class="dropdown__menu" id="products" role="menu">
+        <span class="section-title">Product Suite</span>
+        <div class="menu-grid">
+
+          <a href="#" class="menu-item">
+            <div class="menu-item__icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <div>
+              <span class="menu-item__title">Analytics Dashboard</span>
+              <span class="menu-item__desc">Monitor metrics, KPIs in real time.</span>
+            </div>
+          </a>
+
+          <a href="#" class="menu-item">
+            <div class="menu-item__icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <span class="menu-item__title">Security Hub</span>
+              <span class="menu-item__desc">Centralized monitoring for protection.</span>
+            </div>
+          </a>
+
+          <a href="#" class="menu-item">
+            <div class="menu-item__icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M19 11H5m14 0v-2a2 2 0 00-2-2H7a2 2 0 00-2 2v2m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2" />
+              </svg>
+            </div>
+            <div>
+              <span class="menu-item__title">Cloud Storage</span>
+              <span class="menu-item__desc">Scalable storage for any app.</span>
+            </div>
+          </a>
+
+          <a href="#" class="menu-item">
+            <div class="menu-item__icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div>
+              <span class="menu-item__title">Automation Engine</span>
+              <span class="menu-item__desc">Automate workflows & reduce tasks.</span>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- SOLUTIONS MENU -->
+      <div class="dropdown__menu" id="solutions" role="menu">
+        <span class="section-title">Solutions</span>
+        <div class="menu-grid" style="grid-template-columns: 1fr;">
+
+          <a href="#" class="menu-item">
+            <div class="menu-item__icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+            </div>
+            <div>
+              <span class="menu-item__title">AI Assistant</span>
+              <span class="menu-item__desc">Enhance productivity with automation.</span>
+            </div>
+          </a>
+
+          <a href="#" class="menu-item">
+            <div class="menu-item__icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <div>
+              <span class="menu-item__title">UI Component Library</span>
+              <span class="menu-item__desc">Prebuilt UI for faster development.</span>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- RESOURCES MENU -->
+      <div class="dropdown__menu" id="resources" role="menu">
+        <div class="menu-grid">
+
+          <a href="#" class="menu-item">
+            <div>
+              <span class="menu-item__title">Documentation</span>
+              <span class="menu-item__desc">Guides and API references.</span>
+            </div>
+          </a>
+
+          <a href="#" class="menu-item">
+            <div>
+              <span class="menu-item__title">Community Forum</span>
+              <span class="menu-item__desc">Join discussions with users.</span>
+            </div>
+          </a>
+
+          <a href="#" class="menu-item">
+            <div>
+              <span class="menu-item__title">Video Tutorials</span>
+              <span class="menu-item__desc">Hands-on guided lessons.</span>
+            </div>
+          </a>
+
+          <a href="#" class="menu-item">
+            <div>
+              <span class="menu-item__title">Support Center</span>
+              <span class="menu-item__desc">Get assistance from experts.</span>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- ENTERPRISE MENU -->
+      <div class="dropdown__menu" id="enterprise" role="menu">
+        <div style="padding:20px; text-align:center;">
+          <span class="menu-item__title">Enterprise Services</span>
+          <p class="menu-item__desc">Custom solutions & dedicated support.</p>
+          <span style="font-size:12px; color:#777;">Tailored for large organizations</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</nav>
+
+<script>
+const navButtons = document.querySelectorAll(".nav__link");
+const dropdown = document.querySelector(".dropdown");
+const menus = document.querySelectorAll(".dropdown__menu");
+const dropdownBg = document.querySelector(".dropdown__background");
+const nav = document.querySelector(".nav");
+
+let leaveTimeout;
+
+function getHeight(element) {
+  return element.scrollHeight;
+}
+
+function handleEnter(targetId, activeButton) {
+  if (leaveTimeout) clearTimeout(leaveTimeout);
+
+  navButtons.forEach((btn) => {
+    btn.classList.remove("nav__link-active");
+    btn.setAttribute("aria-expanded", "false");
+  });
+
+  if (activeButton) {
+    activeButton.classList.add("nav__link-active");
+    activeButton.setAttribute("aria-expanded", "true");
+  }
+
+  dropdown.classList.add("dropdown-visible");
+  dropdown.setAttribute("aria-hidden", "false");
+
+  if (targetId) {
+    const targetMenu = document.getElementById(targetId);
+
+    menus.forEach((menu) => {
+      menu.classList.remove("is-active");
+      menu.setAttribute("aria-hidden", "true");
+    });
+
+    if (targetMenu) {
+      targetMenu.classList.add("is-active");
+      targetMenu.setAttribute("aria-hidden", "false");
+      const height = getHeight(targetMenu);
+      dropdownBg.style.setProperty("--current-height", `${height}px`);
+    }
+  }
+}
+
+function handleLeave() {
+  leaveTimeout = setTimeout(() => {
+    dropdown.classList.remove("dropdown-visible");
+    dropdown.setAttribute("aria-hidden", "true");
+
+    navButtons.forEach((btn) => {
+      btn.classList.remove("nav__link-active");
+      btn.setAttribute("aria-expanded", "false");
+    });
+
+    menus.forEach((menu) => {
+      menu.setAttribute("aria-hidden", "true");
+      menu.classList.remove("is-active");
+    });
+  }, 150);
+}
+
+navButtons.forEach((btn) => {
+  btn.addEventListener("mouseenter", () => {
+    handleEnter(btn.getAttribute("aria-controls"), btn);
+  });
+
+  btn.addEventListener("click", () => {
+    const isExpanded = btn.getAttribute("aria-expanded") === "true";
+    if (isExpanded) handleLeave();
+    else handleEnter(btn.getAttribute("aria-controls"), btn);
+  });
+
+  btn.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      const targetId = btn.getAttribute("aria-controls");
+      handleEnter(targetId, btn);
+      const firstLink = document.getElementById(targetId).querySelector("a, button");
+      if (firstLink) firstLink.focus();
+    }
+  });
+});
+
+nav.addEventListener("mouseleave", handleLeave);
+
+dropdown.addEventListener("mouseenter", () => {
+  if (leaveTimeout) clearTimeout(leaveTimeout);
+});
+
+dropdown.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    const activeBtn = document.querySelector(".nav__link[aria-expanded='true']");
+    handleLeave();
+    if (activeBtn) activeBtn.focus();
+  }
+});
+</script>
+
+</body>
+</html>
